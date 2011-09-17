@@ -80,7 +80,7 @@ proc eventLoop {} {
 	after 30 eventLoop
 }
 
-pack [canvas .c] -side top
+pack [canvas .c] -side top -expand 1 -fill both
 
 set ::carId [.c create poly 10 0 20 10 0 20 -fill blue -tags car]
 
@@ -89,6 +89,11 @@ bind .c <Right> {incrAng}
 bind .c <Up>    {incr ::carSpeed}
 bind .c <Down>  {incr ::carSpeed -1}
 bind .c <Enter> {focus %W}
+
+bind .c <Configure> {
+	%W configure -width  [winfo width  .c]
+	%W configure -height [winfo height .c]
+}
 
 eventLoop
 
