@@ -82,8 +82,8 @@ pack [canvas .c] -side top
 
 set ::carId [.c create poly 10 0 20 10 0 20 -fill blue -tags car]
 
-bind .c <Left>  {incrAng}
-bind .c <Right> {decrAng}
+bind .c <Left>  {decrAng}
+bind .c <Right> {incrAng}
 bind .c <Up>    {incr ::carSpeed}
 bind .c <Down>  {incr ::carSpeed -1}
 bind .c <Enter> {focus %W}
