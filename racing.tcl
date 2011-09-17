@@ -54,14 +54,16 @@ proc makeCar {r t offX offY} {
 }
 
 proc incrAng {} {
-	set ::carAng [expr $::carAng + $::deg]
+	set amt [expr (abs($::carSpeed)+3) / 4.0 * $::deg]
+	set ::carAng [expr $::carAng + $amt]
 	if {$::carAng > 2 * $::pi} {
 		set ::carAng 0
 	}
 }
 
 proc decrAng {} {
-	set ::carAng [expr $::carAng - $::deg]
+	set amt [expr (abs($::carSpeed)+3) / 4.0 * $::deg]
+	set ::carAng [expr $::carAng - $amt]
 	if {$::carAng < 0} {
 		set ::carAng [expr 2 * $::pi]
 	}
