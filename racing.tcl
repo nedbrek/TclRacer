@@ -1,5 +1,17 @@
 load ./sdlmix.dll
-sdl::mix::music [lindex [glob *.mod] 0]
+
+set ::music 0
+
+proc toggleMusic {} {
+	if {$::music} {
+		sdl::mix::music ""
+		set ::music 0
+	} else {
+		sdl::mix::music [lindex [glob *.mod] 0]
+		set ::music 1
+	}
+}
+toggleMusic
 
 set ::pi       [expr 4 * atan(1)]
 set ::carAng   [expr 5 * $pi / 8]
@@ -92,6 +104,8 @@ bind .c <Right> {incrAng}
 bind .c <Up>    {incr ::carSpeed}
 bind .c <Down>  {incr ::carSpeed -1}
 bind .c <Enter> {focus %W}
+
+bind .c <m> {toggleMusic}
 
 bind .c <Configure> {
 	%W configure -width  [winfo width  .c]
