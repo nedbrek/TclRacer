@@ -1,5 +1,5 @@
 load ./sdlmix.dll
-sdl::music play [lindex [glob *.mod] 0]
+sdl::mix::music [lindex [glob *.mod] 0]
 
 set ::pi       [expr 4 * atan(1)]
 set ::carAng   [expr 5 * $pi / 8]
