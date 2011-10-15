@@ -106,6 +106,7 @@ Class create ^Car
 
 #### cars
 ^Car create p1car ;# player 1 car
+^Car create ccar 200 200;# computer car
 
 #### music
 set ::music 0
@@ -121,18 +122,22 @@ proc toggleMusic {} {
 }
 toggleMusic
 
+#### event loop
 proc eventLoop {} {
 	p1car move
+	ccar move
 
 	# redraw car
 	.c coords $::carId [p1car makeCar]
+	.c coords $::ccarId [ccar makeCar]
 
 	after 30 eventLoop
 }
 
 pack [canvas .c] -side top -expand 1 -fill both
 
-set ::carId [.c create poly [p1car makeCar] -fill blue -tags car]
+set ::carId  [.c create poly [p1car makeCar] -fill blue -tags car]
+set ::ccarId [.c create poly [ccar makeCar] -fill red -tags car]
 
 bind .c <Left>  {p1car decrAng}
 bind .c <Right> {p1car incrAng}
