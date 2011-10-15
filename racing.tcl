@@ -32,12 +32,12 @@ Class create ^Car
 	set ret ""
 
 	# point 1, right side
-	lappend ret [expr $r * cos($t+90) + $offX]
-	lappend ret [expr $r * sin($t+90) + $offY]
+	lappend ret [expr $r * cos($t+90*$::deg) + $offX]
+	lappend ret [expr $r * sin($t+90*$::deg) + $offY]
 
 	# point 2, left side
-	lappend ret [expr $r * cos($t-90) + $offX]
-	lappend ret [expr $r * sin($t-90) + $offY]
+	lappend ret [expr $r * cos($t-90*$::deg) + $offX]
+	lappend ret [expr $r * sin($t-90*$::deg) + $offY]
 
 	# point 3, front
 	lappend ret [expr 2*$r * cos($t) + $offX]
@@ -89,7 +89,7 @@ Class create ^Car
 
 	set amt [expr (abs($carSpeed)+3) / 4.0 * $::deg]
 	set carAng [expr $carAng + $amt]
-	if {$carAng > 2 * $::pi} {
+	if {$carAng >= 2 * $::pi} {
 		set carAng 0
 	}
 }
