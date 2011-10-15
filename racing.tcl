@@ -11,13 +11,13 @@ set ::deg [expr $pi / 180]
 #### Car class
 Class create ^Car
 
-^Car instproc init {} {
+^Car instproc init {{x 15} {y 10}} {
 	my instvar carAng carSpeed carX carY
 
 	set carAng   [expr 5 * $::pi / 8]
 	set carSpeed  0
-	set carX     15
-	set carY     10
+	set carX     $x
+	set carY     $y
 }
 
 # construct a triplet of coords
@@ -132,7 +132,7 @@ proc eventLoop {} {
 
 pack [canvas .c] -side top -expand 1 -fill both
 
-set ::carId [.c create poly 10 0 20 10 0 20 -fill blue -tags car]
+set ::carId [.c create poly [p1car makeCar] -fill blue -tags car]
 
 bind .c <Left>  {p1car decrAng}
 bind .c <Right> {p1car incrAng}
