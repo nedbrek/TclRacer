@@ -8,6 +8,104 @@ load ./sdlmix.dll
 set ::pi  [expr 4 * atan(1)]
 set ::deg [expr $pi / 180]
 
+# z coordinate of the vector product of a triangle
+proc zVecProd {p1x p1y p2x p2y p3x p3y} {
+	return [expr ($p1x - $p3x) * ($p2y - $p3y) - \
+	             ($p1y - $p3y) * ($p2x - $p3x)]
+}
+
+# return true if the triangles PQR1 and PQR2 have edge intersection
+proc edgeIntersect {p1x p1y q1x q1y r1x r1y p2x p2y q2x q2y r2x r2y} {
+
+  if {[zVecProd $r2x $r2y $p2x $p2y $q1x $q1y] >= 0.0} {
+
+    if {[zVecProd $p1x $p1y $p2x $p2y $q1x $q1y] >= 0.0} {
+        return [expr [zVecProd $p1x $p1y $q1x $q1y $r2x $r2y] >= 0.0]
+    }
+
+    return [expr {[zVecProd $q1x $q1y $r1x $r1y $p2x $p2y] >= 0.0 &&
+	               [zVecProd $r1x $r1y $p1x $p1y $p2x $p2y] >= 0.0}]
+  }
+
+  if {[zVecProd $r2x $r2y $p2x $p2y $r1x $r1y] < 0.0} {
+     return 0
+  }
+
+  if {[zVecProd $p1x $p1y $p2x $p2y $r1x $r1y] >= 0.0} {
+
+     return [expr {[zVecProd $p1x $p1y $r1x $r1y $r2x $r2y] >= 0.0 ||
+	                [zVecProd $q1x $q1y $r1x $r1y $r2x $r2y] >= 0.0}]
+  }
+
+  return 0
+}
+
+# return true if triangle 1 (pqr) intersects 2 (pqr) via a vertex
+proc vertIntersect {p1x p1y q1x q1y r1x r1y p2x p2y q2x q2y r2x r2y} {
+
+	if {[zVecProd $r2x $r2y $p2x $p2y $q1x $q1y] >= 0.0} {
+
+		if {[zVecProd $r2x $r2y $q2x $q2y $q1x $q1y] <= 0.0} {
+
+			if {[zVecProd $p1x $p1y $p2x $p2y $q1x $q1y] > 0.0} {
+
+				return [expr {[zVecProd $p1x $p1y $q2x $q2y $q1x $q1y] <= 0.0}]
+			}
+
+			return [expr {[zVecProd $p1x $p1y $p2x $p2y $r1x $r1y] >= 0.0 &&
+			              [zVecProd $q1x $q1y $r1x $r1y $p2x $p2y] >= 0.0}]
+		}
+
+		return [expr {[zVecProd $p1x $p1y $q2x $q2y $q1x $q1y] <= 0.0 &&
+		              [zVecProd $r2x $r2y $q2x $q2y $r1x $r1y] <= 0.0 &&
+		              [zVecProd $q1x $q1y $r1x $r1y $q2x $q2y] >= 0.0}]
+	}
+
+	if {[zVecProd $r2x $r2y $p2x $p2y $r1x $r1y] < 0.0} {
+		return 0
+	}
+
+	if {[zVecProd $q1x $q1y $r1x $r1y $r2x $r2y] >= 0.0} {
+
+		return [expr {[zVecProd $p1x $p1y $p2x $p2y $r1x $r1y] >= 0.0}]
+	}
+
+	return [expr {[zVecProd $q1x $q1y $r1x $r1y $q2x $q2y] >= 0.0 &&
+	              [zVecProd $r2x $r2y $r1x $r1y $q2x $q2y] >= 0.0}]
+}
+
+# return true if triangle 1 (pqr) intersects triange 2 (pqr)
+proc triIntersect {p1x p1y q1x q1y r1x r1y p2x p2y q2x q2y r2x r2y} {
+
+	if {[zVecProd $p2x $p2y $q2x $q2y $p1x $p1y] >= 0.0} {
+
+		if {[zVecProd $q2x $q2y $r2x $r2y $p1x $p1y] >= 0.0} {
+
+			if {[zVecProd $r2x $r2y $p2x $p2y $p1x $p1y] >= 0.0} {
+				return 1
+			}
+
+			return [edgeIntersect $p1x $p1y $q1x $q1y $r1x $r1y $p2x $p2y $q2x $q2y $r2x $r2y]
+		}
+
+		if {[zVecProd $r2x $r2y $p2x $p2y $p1x $p1y] >= 0.0} {
+			return [edgeIntersect $p1x $p1y $q1x $q1y $r1x $r1y $r2x $r2y $p2x $p2y $q2x $q2y]
+		}
+
+		return [vertIntersect $p1x $p1y $q1x $q1y $r1x $r1y $p2x $p2y $q2x $q2y $r2x $r2y]
+	}
+
+	if {[zVecProd $q2x $q2y $r2x $r2y $p1x $p1y] >= 0.0} {
+		if {[zVecProd $r2x $r2y $p2x $p2y $p1x $p1y] >= 0.0} {
+			return [edgeIntersect $p1x $p1y $q1x $q1y $r1x $r1y $q2x $q2y $r2x $r2y $p2x $p2y]
+		}
+
+		return [vertIntersect $p1x $p1y $q1x $q1y $r1x $r1y $q2x $q2y $r2x $r2y $p2x $p2y]
+	}
+
+	return [vertIntersect $p1x $p1y $q1x $q1y $r1x $r1y $r2x $r2y $p2x $p2y $q2x $q2y]
+}
+
 #### Car class
 Class create ^Car
 
@@ -20,28 +118,8 @@ Class create ^Car
 	set carY     $y
 }
 
-# construct a triplet of coords
-^Car instproc makeCar {} {
+^Car instproc checkWalls {ret} {
 	my instvar carAng carSpeed carX carY
-
-	set r 10 ;# car "radius" (size)
-	set t $carAng
-	set offX $carX
-	set offY $carY
-
-	set ret ""
-
-	# point 1, right side
-	lappend ret [expr $r * cos($t+90*$::deg) + $offX]
-	lappend ret [expr $r * sin($t+90*$::deg) + $offY]
-
-	# point 2, left side
-	lappend ret [expr $r * cos($t-90*$::deg) + $offX]
-	lappend ret [expr $r * sin($t-90*$::deg) + $offY]
-
-	# point 3, front
-	lappend ret [expr 2*$r * cos($t) + $offX]
-	lappend ret [expr 2*$r * sin($t) + $offY]
 
 	set minX [expr min([lindex $ret 0],[lindex $ret 2],[lindex $ret 4])]
 	set minY [expr min([lindex $ret 1],[lindex $ret 3],[lindex $ret 5])]
@@ -67,6 +145,30 @@ Class create ^Car
 		set carY [expr $carY - $maxY + $cheight]
 		set carSpeed 0
 	}
+}
+
+# construct a triplet of coords
+^Car instproc makeCar {} {
+	my instvar carAng carSpeed carX carY
+
+	set r 10 ;# car "radius" (size)
+	set t $carAng
+	set offX $carX
+	set offY $carY
+
+	set ret ""
+
+	# point 1, right side
+	lappend ret [expr $r * cos($t+90*$::deg) + $offX]
+	lappend ret [expr $r * sin($t+90*$::deg) + $offY]
+
+	# point 2, left side
+	lappend ret [expr $r * cos($t-90*$::deg) + $offX]
+	lappend ret [expr $r * sin($t-90*$::deg) + $offY]
+
+	# point 3, front
+	lappend ret [expr 2*$r * cos($t) + $offX]
+	lappend ret [expr 2*$r * sin($t) + $offY]
 
 	return $ret
 }
@@ -127,9 +229,19 @@ proc eventLoop {} {
 	p1car move
 	ccar move
 
+	set c1loc [p1car makeCar]
+	set c2loc [ccar makeCar]
+	p1car checkWalls $c1loc
+	ccar  checkWalls $c2loc
+
+	if {[triIntersect {*}$c1loc {*}$c2loc]} {
+		p1car set carSpeed 0
+		ccar  set carSpeed 0
+	}
+
 	# redraw car
-	.c coords $::carId [p1car makeCar]
-	.c coords $::ccarId [ccar makeCar]
+	.c coords $::carId  $c1loc
+	.c coords $::ccarId $c2loc
 
 	after 30 eventLoop
 }
